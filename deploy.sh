@@ -21,22 +21,6 @@ function buildAndPushImage(){
   cd -
 }
 
-
-
-echo $DOCKER_PASSWORD | docker login --username=${DOCKER_USER} ${DOCKER_REGISTRY} --password-stdin
-
-printLog "Building and deploying images..."
-buildAndPushImage ${CURRENT_DOW_BOT_DIRECTORY} ${DOCKER_DOW_BOT_IMAGE}
-buildAndPushImage ${CURRENT_DOW_DASH_DIRECTORY} ${DOCKER_DOW_DASH_IMAGE}
-
-
-build_dir="build"
-project_dir_name="project"
-project_dir="${build_dir}/${project_dir_name}"
-
-rm -rf $build_dir
-mkdir -p $project_dir
-
 function copyComposeFiles(){
   local source_dir="$1"
   local destination_dir="$2"
@@ -78,6 +62,20 @@ function makeArchive() {
     tar -czvf ${archive_name} ${archive_directory_name}
   cd -
 }
+
+build_dir="build"
+project_dir_name="project"
+project_dir="${build_dir}/${project_dir_name}"
+
+rm -rf $build_dir
+mkdir -p $project_dir
+
+echo $DOCKER_PASSWORD | docker login --username=${DOCKER_USER} ${DOCKER_REGISTRY} --password-stdin
+
+printLog "Building and deploying images..."
+buildAndPushImage ${CURRENT_DOW_BOT_DIRECTORY} ${DOCKER_DOW_BOT_IMAGE}
+buildAndPushImage ${CURRENT_DOW_DASH_DIRECTORY} ${DOCKER_DOW_DASH_IMAGE}
+
 printLog "Copying docker-compose files for building..."
 copyComposeFiles ${CURRENT_DOW_BOT_DIRECTORY} ${project_dir}/dow-bot
 copyComposeFiles ${CURRENT_DOW_DASH_DIRECTORY} ${project_dir}/dow-dash
