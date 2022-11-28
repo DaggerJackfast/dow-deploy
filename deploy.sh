@@ -109,6 +109,7 @@ ssh -i "${REMOTE_SSH_KEY_FILE}" -t ${REMOTE_USER}@${REMOTE_SERVER} << EOF
   cd ${REMOTE_DIRECTORY}
 
   tar -xzvf ${project_archive}
+  rm -rf ${project_archive}
 
   /usr/bin/bash ${project_dir_name}/dow-redis/scripts/run_docker.sh
 
@@ -118,6 +119,5 @@ ssh -i "${REMOTE_SSH_KEY_FILE}" -t ${REMOTE_USER}@${REMOTE_SERVER} << EOF
 
   /usr/bin/bash ${project_dir_name}/dow-bot/scripts/run_docker.sh ${DOCKER_DOW_BOT_IMAGE}
 
-  rm -rf ${project_archive}
 EOF
 printLog "Finished deploy"
