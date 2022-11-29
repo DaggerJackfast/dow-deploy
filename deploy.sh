@@ -91,7 +91,7 @@ bot_env_files=(".env.production" ".env.database")
 copyEnvironmentFiles ${CURRENT_DOW_BOT_DIRECTORY} ${project_dir}/dow-bot "${bot_env_files[@]}"
 dash_env_files=(".env.production")
 copyEnvironmentFiles ${CURRENT_DOW_DASH_DIRECTORY} ${project_dir}/dow-dash "${dash_env_files[@]}"
-redis_env_files=(".env.redis")
+redis_env_files=(".env.redis" ".hash_file")
 copyEnvironmentFiles ${CURRENT_DOW_REDIS_DIRECTORY} ${project_dir}/dow-redis "${redis_env_files[@]}"
 
 printLog "Making project archive..."
