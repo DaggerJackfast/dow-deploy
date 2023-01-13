@@ -6,4 +6,5 @@
 !.env.example
 build
 *.key
+*.key.pub
 .Trashes
