@@ -74,25 +74,16 @@ echo $DOCKER_PASSWORD | docker login --username=${DOCKER_USER} ${DOCKER_REGISTRY
 
 printLog "Building and deploying images..."
 buildAndPushImage ${CURRENT_DOW_BOT_DIRECTORY} ${DOCKER_DOW_BOT_IMAGE}
-buildAndPushImage ${CURRENT_DOW_DASH_DIRECTORY} ${DOCKER_DOW_DASH_IMAGE}
 
 printLog "Copying docker-compose files for building..."
 copyComposeFiles ${CURRENT_DOW_BOT_DIRECTORY} ${project_dir}/dow-bot
-copyComposeFiles ${CURRENT_DOW_DASH_DIRECTORY} ${project_dir}/dow-dash
-copyComposeFiles ${CURRENT_DOW_REDIS_DIRECTORY} ${project_dir}/dow-redis
 
 printLog "Copying run_docker files for building..."
 copyRunScriptFiles ${CURRENT_DOW_BOT_DIRECTORY} ${project_dir}/dow-bot
-copyRunScriptFiles ${CURRENT_DOW_DASH_DIRECTORY} ${project_dir}/dow-dash
-copyRunScriptFiles ${CURRENT_DOW_REDIS_DIRECTORY} ${project_dir}/dow-redis
 
 printLog "Copying environment variables files for building..."
-bot_env_files=(".env.production" ".env.database")
+bot_env_files=(".env.production")
 copyEnvironmentFiles ${CURRENT_DOW_BOT_DIRECTORY} ${project_dir}/dow-bot "${bot_env_files[@]}"
-dash_env_files=(".env.production")
-copyEnvironmentFiles ${CURRENT_DOW_DASH_DIRECTORY} ${project_dir}/dow-dash "${dash_env_files[@]}"
-redis_env_files=(".env.redis" ".hash_file")
-copyEnvironmentFiles ${CURRENT_DOW_REDIS_DIRECTORY} ${project_dir}/dow-redis "${redis_env_files[@]}"
 
 printLog "Making project archive..."
 current_date=$(date +'%m-%d-%Y_%H-%M-%S')
@@ -111,13 +102,17 @@ ssh -i "${REMOTE_SSH_KEY_FILE}" -t ${REMOTE_USER}@${REMOTE_SERVER} << EOF
   tar -xzvf ${project_archive}
   rm -rf ${project_archive}
 
-  /usr/bin/bash ${project_dir_name}/dow-redis/scripts/run_docker.sh
-
   echo $DOCKER_PASSWORD | docker login --username=${DOCKER_USER} ${DOCKER_REGISTRY} --password-stdin
-
-  /usr/bin/bash ${project_dir_name}/dow-dash/scripts/run_docker.sh ${DOCKER_DOW_DASH_IMAGE}
 
   /usr/bin/bash ${project_dir_name}/dow-bot/scripts/run_docker.sh ${DOCKER_DOW_BOT_IMAGE}
 
 EOF
+
+printLog "Deploy to cloudflare pages"
+cd ${CURRENT_DOW_DASH_DIRECTORY}
+  [[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh
+  nvm use
+  /usr/bin/bash ./scripts/deploy.sh ${CLOUDFLARE_ACCOUNT_ID} ${CLOUDFLARE_API_TOKEN} ${CLOUDFLARE_PAGE_PROJECT_NAME}
+cd -
+
 printLog "Finished deploy"
