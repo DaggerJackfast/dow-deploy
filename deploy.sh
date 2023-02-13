@@ -115,4 +115,6 @@ cd ${CURRENT_DOW_DASH_DIRECTORY}
   /usr/bin/bash ./scripts/deploy.sh ${CLOUDFLARE_ACCOUNT_ID} ${CLOUDFLARE_API_TOKEN} ${CLOUDFLARE_PAGE_PROJECT_NAME}
 cd -
 
+printLog "Cleaning unused docker build cache objects"
+docker system prune -f
 printLog "Finished deploy"
